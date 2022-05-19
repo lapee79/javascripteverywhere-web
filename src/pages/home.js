@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery, gql } from "@apollo/client";
 
-import Button from "../components/Button";
+import NoteFeed from "../components/NoteFeed";
 
 // variable로 저장한 graphQL query
 const GET_NOTES = gql`
@@ -38,13 +38,7 @@ const Home = () => {
     }
 
     // data loading에 성공하면 UI에 data 표시
-    return (
-        <div>
-            {data.noteFeed.notes.map(note => (
-                <div key={note.id}>{note.author.username}</div>
-            ))}
-        </div>
-    );
+    return <NoteFeed notes={data.noteFeed.notes} />;
 };
 
 export default Home;
