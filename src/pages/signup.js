@@ -51,8 +51,10 @@ const SignUp = props => {
     // mutation hook 추가
     const [signUp, { loading, error }] = useMutation(SIGNUP_USER, {
         onCompleted: data => {
-            // mutation이 완료되면 JWT를 logging
-            console.log(data.signUp);
+            // JWT를 localStorage에 저장
+            localStorage.setItem('token', data.signUp);
+            // User를 home으로 redirect
+            props.history.push('/');
         }
     });
 
