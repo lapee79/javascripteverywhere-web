@@ -23,13 +23,20 @@ const authLink = setContext((_, { headers }) => {
     };
 });
 
-// Apollo Client 설정
+// create the Apollo client
 const client = new ApolloClient({
     link: authLink.concat(httpLink),
     cache,
     resolvers: {},
     connectToDevTools: true
 });
+
+//check for a local token
+const data = { isLoggedIn: !!localStorage.getItem('token') };
+// write the cache data on initial load
+cache.writeData({ data });
+// Write the cache data after cache is reset
+client.onResetStore(() => cache.writeData({ data }));
 
 const App = () => {
     return (

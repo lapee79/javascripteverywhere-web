@@ -1,28 +1,7 @@
-import { gql, useMutation } from "@apollo/client";
-import React, { useEffect, useState } from "react";
-import styled from 'styled-components';
+import React, { useEffect } from 'react';
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 
-import Button from '../components/Button';
-
-const Wrapper = styled.div`
-    border: 1px solid #f5f4f0;
-    max-width: 500px;
-    padding: 1em;
-    margin: 0 auto;
-`;
-
-const Form = styled.form`
-    label,
-    input {
-        isplay: block;
-        ine-height: 2em;
-    }
-
-    input {
-        width: 100%;
-        margin-bottom: 1em;
-    }
-`;
+import UserForm from '../components/UserForm';
 
 const SIGNUP_USER = gql`
     mutation signUp($email: String!, $username: String!, $password: String!) {
@@ -48,59 +27,28 @@ const SignUp = props => {
         document.title = 'Sign Up - Notedly';
     });
 
-    // mutation hook 추가
+    // Apollo Client
+    const client = useApolloClient();
+    // mutation hook
     const [signUp, { loading, error }] = useMutation(SIGNUP_USER, {
         onCompleted: data => {
             // JWT를 localStorage에 저장
             localStorage.setItem('token', data.signUp);
+            // Update localCache
+            client.writeData({ data: { isLoggedIn: true } });
             // User를 home으로 redirect
             props.history.push('/');
         }
     });
 
     return (
-        <Wrapper>
-            <h2>Sign Up</h2>
-            {/* User가 Form을 제출하면 데이터를 mutation으로 전달 */}
-            <Form
-                onSubmit={event => {
-                    event.preventDefault();
-                    signUp({
-                        variables: {
-                            ...values
-                        }
-                    });
-                }}>
-                <label htmlFor="username">Username:</label>
-                <input
-                    required
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="username"
-                    onChange={onChange}
-                />
-                <label htmlFor="email">Email:</label>
-                <input
-                    required
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Email"
-                    onChange={onChange}
-                />
-                <label htmlFor="password">Password:</label>
-                <input
-                    required
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Password"
-                    onChange={onChange}
-                />
-                <Button type="submit">Submit</Button>
-            </Form>
-        </Wrapper>
+        <React.Fragment>
+            <UserForm action={signUp} formType="signup" />
+            {/* if the data is loading, display a loading message */}
+            {loading && <p>Loading...</p>}
+            {/* if there is an error, display a error message */}
+            {error && <p>Error creating an account!</p>}
+        </React.Fragment>
     );
 };
 
